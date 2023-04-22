@@ -1,0 +1,31 @@
+//@version=4
+strategy("Estrategia de Cruce de Medias Móviles", overlay=true)
+
+// Entradas del usuario
+fast_length = input(title="Longitud de la Media Móvil Rápida", type=input.integer, defval=9, minval=1)
+slow_length = input(title="Longitud de la Media Móvil Lenta", type=input.integer, defval=21, minval=1)
+MACD_length = input(title="Longitud de la señal MACD", type=input.integer, defval=9, minval=1)
+
+// Calculo de las medias móviles exponenciales (EMA)
+ema1 = ema(close, fast_length)
+ema2 = ema(close, slow_length)
+
+// Calculo de la señal MACD
+MACD = ema1 - ema2
+signal = ema(MACD, MACD_length)
+
+// Detectar cruces de la señal MACD
+buy_signal = crossover(MACD, signal)
+sell_signal = crossunder(MACD, signal)
+
+// Plot de las medias móviles exponenciales y la señal MACD
+plot(ema1, color=color.green, title="EMA Rápida")
+plot(ema2, color=color.red, title="EMA Lenta")
+plot(MACD, color=color.blue, title="MACD")
+plot(signal, color=color.yellow, title="Señal MACD")
+
+// Ejecutar operaciones de compra y venta
+if (buy_signal)
+    strategy.entry("Compra", strategy.long)
+if (sell_signal)
+    strategy.entry("Venta", strategy.short)
